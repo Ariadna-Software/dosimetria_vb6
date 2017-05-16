@@ -1,0 +1,7 @@
+                 INFORME DE MIGRACION PANASONIC       archivo..JAN11D00.DAT
+ 
+ 
+ 
+Tipo    Fecha     Hora Lec.  Dosimet Ref   Cristal 1       Cristal 2      Cristal 3      Cristal 4
+==== ===========  =========  ======= ===  ============   ============   ============   ============
+---   11/01/13   13:07   0014423       0001.75        0001.45        0001.81        0001.76     

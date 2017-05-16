@@ -1,0 +1,301 @@
+DROP TABLE IF EXISTS `ztempemail`;
+DROP TABLE IF EXISTS `zlistadomigracion`;
+DROP TABLE IF EXISTS `zlistadocsn`;
+DROP TABLE IF EXISTS `zdosisacumtot`;
+DROP TABLE IF EXISTS `zdosisacum`;
+DROP TABLE IF EXISTS `zdosimnorec`;
+DROP TABLE IF EXISTS `zbloqueos`;
+DROP TABLE IF EXISTS `voperarios`;
+DROP TABLE IF EXISTS `vinstalaciones`;
+DROP TABLE IF EXISTS `vempresas`;
+DROP TABLE IF EXISTS `usuarios`;
+DROP TABLE IF EXISTS `usuarioempresadosis`;
+DROP TABLE IF EXISTS `tempnc`;
+DROP TABLE IF EXISTS `tipmedext`;
+DROP TABLE IF EXISTS `recepdosim`;
+DROP TABLE IF EXISTS `rangoscsn`;
+DROP TABLE IF EXISTS `pcs`;
+DROP TABLE IF EXISTS `parametros`;
+DROP TABLE IF EXISTS `lotespana`;
+DROP TABLE IF EXISTS `lotes`;
+DROP TABLE IF EXISTS `fondospana`;
+DROP TABLE IF EXISTS `fondos`;
+DROP TABLE IF EXISTS `factcali6600`;
+DROP TABLE IF EXISTS `factcali4400`;
+DROP TABLE IF EXISTS `erroresmigra`;
+DROP TABLE IF EXISTS `empresadosis`;
+DROP TABLE IF EXISTS `dosisnohomog`;
+DROP TABLE IF EXISTS `dosiscuerpo`;
+DROP TABLE IF EXISTS `dosisarea`;
+DROP TABLE IF EXISTS `dosimetros`;
+DROP TABLE IF EXISTS `operainstala`;
+DROP TABLE IF EXISTS `operarios`;
+DROP TABLE IF EXISTS `instalaciones`;
+DROP TABLE IF EXISTS `empresas`;
+DROP TABLE IF EXISTS `tipostrab`;
+DROP TABLE IF EXISTS `ramaespe`;
+DROP TABLE IF EXISTS `ramagene`;
+DROP TABLE IF EXISTS `provincias`;
+DROP TABLE IF EXISTS `configuracion`;
+CREATE TABLE `configuracion` ( `clave` varchar(25) NOT NULL default '',  `valor` varchar(50) default NULL,  PRIMARY KEY  (`clave`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `provincias` ( `c_postal` char(2) NOT NULL default '',  `descripcion` varchar(30) NOT NULL default '',  `prefijo` char(3) default NULL,  PRIMARY KEY  (`c_postal`),  KEY `F_nom_prov` (`descripcion`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `ramagene` (  `cod_rama_gen` char(2) NOT NULL default '',  `descripcion` varchar(30) NOT NULL default '',  PRIMARY KEY  (`cod_rama_gen`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `ramaespe` (  `cod_rama_gen` char(2) NOT NULL default '',  `c_rama_especifica` char(2) NOT NULL default '',  `descripcion` varchar(30) NOT NULL default '',  PRIMARY KEY  (`cod_rama_gen`,`c_rama_especifica`),  CONSTRAINT `ramaespe_ibfk_1` FOREIGN KEY (`cod_rama_gen`) REFERENCES `ramagene` (`cod_rama_gen`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `tipostrab` (  `cod_rama_gen` char(2) NOT NULL default '',  `c_tipo_trabajo` char(2) NOT NULL default '',  `descripcion` varchar(30) NOT NULL default '',  PRIMARY KEY  (`cod_rama_gen`,`c_tipo_trabajo`),  CONSTRAINT `tipostrab_ibfk_1` FOREIGN KEY (`cod_rama_gen`) REFERENCES `ramagene` (`cod_rama_gen`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `empresas` (  `c_empresa` varchar(11) NOT NULL default '',  `f_alta` date NOT NULL default '0000-00-00',  `f_baja` date default NULL,  `cif_nif` varchar(15) default NULL,  `nom_comercial` varchar(40) NOT NULL default '',  `direccion` varchar(30) default NULL,  `poblacion` varchar(25) default NULL,  `c_postal` char(2) NOT NULL default '',  `distrito` char(3) default NULL,  `tel_contacto` varchar(14) default NULL,  `fax` varchar(14) default NULL,  `pers_contacto` varchar(40) default NULL,  `migrado` char(2) default NULL,  `mail_internet` varchar(30) default NULL,  `c_tipo` tinyint(4) NOT NULL default '0',  PRIMARY KEY  (`c_empresa`,`f_alta`),  KEY `F_empresas_mig` (`c_empresa`,`f_alta`,`f_baja`,`migrado`),  KEY `F_empresas` (`c_empresa`,`f_baja`),  KEY `F_nom_empresa` (`nom_comercial`),  KEY `F_c_postal` (`c_postal`),  CONSTRAINT `empresas_ibfk_1` FOREIGN KEY (`c_postal`) REFERENCES `provincias` (`c_postal`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `instalaciones` (  `c_empresa` varchar(11) NOT NULL default '',  `c_instalacion` varchar(11) NOT NULL default '',  `f_alta` date NOT NULL default '0000-00-00',  `f_baja` date default NULL,  `descripcion` varchar(50) NOT NULL default '',  `direccion` varchar(50) default NULL,  `poblacion` varchar(25) default NULL,  `c_postal` char(2) NOT NULL default '',  `distrito` char(3) default NULL,  `telefono` varchar(14) default NULL,  `fax` varchar(14) default NULL,  `persona_contacto` varchar(40) default NULL,  `migrado` char(2) default NULL,  `rama_gen` char(2) NOT NULL default '',  `rama_especifica` char(2) NOT NULL default '',  `mail_internet` varchar(30) default NULL,  `observaciones` varchar(80) default NULL,  `c_tipo` tinyint(4) NOT NULL default '0',  PRIMARY KEY  (`c_empresa`,`c_instalacion`,`f_alta`),  KEY `F_instalaciones` (`c_instalacion`,`f_baja`),  KEY `F_nom_instala` (`descripcion`),  KEY `F_postal` (`c_postal`),  KEY `F_ramespe_instal` (`rama_gen`,`rama_especifica`),  CONSTRAINT `instalaciones_ibfk_1` FOREIGN KEY (`c_empresa`) REFERENCES `empresas` (`c_empresa`),  CONSTRAINT `instalaciones_ibfk_2` FOREIGN KEY (`c_postal`) REFERENCES `provincias` (`c_postal`),  CONSTRAINT `instalaciones_ibfk_3` FOREIGN KEY (`rama_gen`, `rama_especifica`) REFERENCES `ramaespe` (`cod_rama_gen`, `c_rama_especifica`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `operarios` (  `dni` varchar(11) NOT NULL default '',  `n_seg_social` varchar(15) default NULL,  `n_carnet_radiolog` varchar(10) default NULL,  `f_emi_carnet_rad` date default NULL,  `apellido_1` varchar(15) NOT NULL default '',  `apellido_2` varchar(15) NOT NULL default '',  `nombre` varchar(15) NOT NULL default '',  `direccion` varchar(40) default NULL,  `poblacion` varchar(30) default NULL,  `c_postal` char(2) NOT NULL default '',  `distrito` char(3) default NULL,  `c_tipo_trabajo` char(2) NOT NULL default '',  `f_nacimiento` date default NULL,  `profesion_catego` varchar(30) default NULL,  `sexo` char(1) NOT NULL default '',  `plantilla_contrata` char(2) NOT NULL default '',  `f_alta` date NOT NULL default '0000-00-00',  `f_baja` date default NULL,  `migrado` char(2) default NULL,  `cod_rama_gen` char(2) NOT NULL default '',  `semigracsn` tinyint(1) NOT NULL default '1',  PRIMARY KEY  (`dni`,`f_alta`),  KEY `F_operarios` (`apellido_1`,`apellido_2`,`nombre`),  KEY `F_provi_ope` (`c_postal`),  KEY `F_tipostrab_ope` (`cod_rama_gen`,`c_tipo_trabajo`),  CONSTRAINT `operarios_ibfk_1` FOREIGN KEY (`c_postal`) REFERENCES `provincias` (`c_postal`),  CONSTRAINT `operarios_ibfk_2` FOREIGN KEY (`cod_rama_gen`, `c_tipo_trabajo`) REFERENCES `tipostrab` (`cod_rama_gen`, `c_tipo_trabajo`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `operainstala` (  `c_empresa` varchar(11) NOT NULL default '',  `c_instalacion` varchar(11) NOT NULL default '',  `dni` varchar(11) NOT NULL default '',  `f_alta` date NOT NULL default '0000-00-00',  `f_baja` date default NULL,  `migrado` char(2) default NULL,  PRIMARY KEY  (`c_empresa`,`c_instalacion`,`dni`,`f_alta`),  KEY `F_empresaoperainstala` (`c_empresa`),  KEY `F_operariooperainstala` (`dni`),  KEY `F_instalaoperainstala` (`c_empresa`,`c_instalacion`),  CONSTRAINT `operainstala_ibfk_1` FOREIGN KEY (`c_empresa`) REFERENCES `empresas` (`c_empresa`),  CONSTRAINT `operainstala_ibfk_2` FOREIGN KEY (`dni`) REFERENCES `operarios` (`dni`),  CONSTRAINT `operainstala_ibfk_3` FOREIGN KEY (`c_empresa`, `c_instalacion`) REFERENCES `instalaciones` (`c_empresa`, `c_instalacion`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `dosimetros` (  `n_reg_dosimetro` int(11) NOT NULL default '0',  `n_dosimetro` varchar(11) NOT NULL default '',  `c_empresa` varchar(11) NOT NULL default '',  `c_instalacion` varchar(11) NOT NULL default '',  `dni_usuario` varchar(11) NOT NULL default '',  `c_tipo_trabajo` char(2) NOT NULL default '',  `plantilla_contrata` char(2) NOT NULL default '',  `f_asig_dosimetro` date NOT NULL default '0000-00-00',  `f_retirada` date default NULL,  `mes_p_i` char(1) NOT NULL default '',  `tipo_dosimetro` smallint(1) NOT NULL default '0',  `observaciones` varchar(30) default NULL,  `cristal_a` decimal(8,3) NOT NULL default '1.000',  `cristal_b` decimal(8,3) NOT NULL default '1.000',  `sistema` char(1) NOT NULL default 'H',  `orden_recepcion` int(10) unsigned NOT NULL default '0',  `tipo_medicion` char(2) default NULL,  PRIMARY KEY  (`n_reg_dosimetro`,`tipo_dosimetro`,`sistema`,`n_dosimetro`),  UNIQUE KEY `f_dosime` (`n_dosimetro`,`tipo_dosimetro`,`f_retirada`),  KEY `F_dosimet_cuerpo` (`n_dosimetro`,`f_asig_dosimetro`,`f_retirada`),  KEY `F_dosimet` (`n_dosimetro`,`f_retirada`),  KEY `F_instalacion` (`c_empresa`,`c_instalacion`),  KEY `F_operainstalacion` (`c_empresa`,`c_instalacion`,`dni_usuario`),  CONSTRAINT `dosimetros_ibfk_1` FOREIGN KEY (`c_empresa`, `c_instalacion`) REFERENCES `instalaciones` (`c_empresa`, `c_instalacion`),  CONSTRAINT `dosimetros_ibfk_2` FOREIGN KEY (`c_empresa`, `c_instalacion`, `dni_usuario`) REFERENCES `operainstala` (`c_empresa`, `c_instalacion`, `dni`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `dosisarea` (  `n_registro` int(11) NOT NULL default '0',  `n_dosimetro` varchar(11) NOT NULL default '',  `c_empresa` varchar(11) NOT NULL default '',  `c_instalacion` varchar(11) NOT NULL default '',  `dni_usuario` varchar(11) NOT NULL default '',  `f_dosis` date NOT NULL default '0000-00-00',  `f_migracion` date NOT NULL default '0000-00-00',  `dosis_superf` decimal(5,2) default '0.00',  `dosis_profunda` decimal(5,2) default '0.00',  `plantilla_contrata` char(2) NOT NULL default '',  `rama_generica` char(2) NOT NULL default '',  `rama_especifica` char(2) NOT NULL default '',  `c_tipo_trabajo` char(2) NOT NULL default '',  `observaciones` varchar(120) default NULL,  `migrado` char(2) default NULL,  `n_reg_dosimetro` int(11) default NULL,  PRIMARY KEY  (`n_registro`),  KEY `F_dosis_area` (`n_registro`,`n_dosimetro`,`dni_usuario`,`f_dosis`,`f_migracion`,`migrado`),  KEY `F_c_instal_dni` (`c_instalacion`,`dni_usuario`),  KEY `F_f_dosis` (`f_dosis`),  KEY `F_dosisprofunda` (`dni_usuario`,`f_dosis`,`dosis_profunda`),  KEY `F_dosisareainstalacion` (`c_empresa`,`c_instalacion`),  CONSTRAINT `dosisarea_ibfk_1` FOREIGN KEY (`c_empresa`, `c_instalacion`) REFERENCES `instalaciones` (`c_empresa`, `c_instalacion`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `dosiscuerpo` (  `n_registro` int(11) NOT NULL default '0',  `n_dosimetro` varchar(11) NOT NULL default '',  `c_empresa` varchar(11) NOT NULL default '',  `c_instalacion` varchar(11) NOT NULL default '',  `dni_usuario` varchar(11) NOT NULL default '',  `f_dosis` date NOT NULL default '0000-00-00',  `f_migracion` date NOT NULL default '0000-00-00',  `dosis_superf` decimal(5,2) default '0.00',  `dosis_profunda` decimal(5,2) default '0.00',  `plantilla_contrata` char(2) NOT NULL default '',  `rama_generica` char(2) NOT NULL default '',  `rama_especifica` char(2) NOT NULL default '',  `c_tipo_trabajo` char(2) NOT NULL default '',  `observaciones` varchar(120) default NULL,  `migrado` char(2) default NULL,  `n_reg_dosimetro` int(11) default NULL,  PRIMARY KEY  (`n_registro`),  KEY `F_dosis_cuerpo` (`n_registro`,`n_dosimetro`,`dni_usuario`,`f_dosis`,`f_migracion`,`migrado`),  KEY `F_c_instal_dni` (`c_instalacion`,`dni_usuario`),  KEY `F_f_dosis` (`f_dosis`),  KEY `F_dosisprofunda` (`dni_usuario`,`f_dosis`,`dosis_profunda`),  KEY `F_dosiscuerpoinstalacion` (`c_empresa`,`c_instalacion`),  CONSTRAINT `dosiscuerpo_ibfk_1` FOREIGN KEY (`c_empresa`, `c_instalacion`) REFERENCES `instalaciones` (`c_empresa`, `c_instalacion`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `dosisnohomog` (  `n_registro` int(11) NOT NULL default '0',  `n_dosimetro` varchar(11) NOT NULL default '',  `dni_usuario` varchar(11) NOT NULL default '',  `c_empresa` varchar(11) NOT NULL default '',  `c_instalacion` varchar(11) NOT NULL default '',  `f_dosis` date NOT NULL default '0000-00-00',  `f_migracion` date NOT NULL default '0000-00-00',  `tipo_medicion` char(2) NOT NULL default '',  `dosis_org` decimal(5,2) default NULL,  `plantilla_contrata` char(2) NOT NULL default '',  `rama_generica` char(2) NOT NULL default '',  `rama_especifica` char(2) NOT NULL default '',  `c_tipo_trabajo` char(2) NOT NULL default '',  `observaciones` varchar(50) default NULL,  `migrado` char(2) default NULL,  `n_reg_dosimetro` int(11) default NULL,  PRIMARY KEY  (`n_registro`),  KEY `F_dosis_no_homo` (`n_registro`,`n_dosimetro`,`dni_usuario`,`f_dosis`,`f_migracion`),  KEY `F_dosisnohomoinstalacion` (`c_empresa`,`c_instalacion`),  CONSTRAINT `dosisnohomog_ibfk_1` FOREIGN KEY (`c_empresa`, `c_instalacion`) REFERENCES `instalaciones` (`c_empresa`, `c_instalacion`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `empresadosis` (  `codempre` tinyint(4) NOT NULL default '0',  `nomempre` char(50) NOT NULL default '',  `nomresum` char(15) NOT NULL default '',  `Usuario` char(20) default NULL,  `Pass` char(20) default NULL,  `Sumi` char(10) default NULL,  PRIMARY KEY  (`codempre`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Empresas en el sistema';
+CREATE TABLE `erroresmigra` (  `n_registro` int(11) NOT NULL default '0',  `descripcion` varchar(60) default NULL,  `c_tipo` tinyint(4) NOT NULL default '0') ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `factcali4400` (  `cristal_2` decimal(8,3) NOT NULL default '0.000',  `cristal_3` decimal(8,3) NOT NULL default '0.000',  `f_inicio` date NOT NULL default '0000-00-00',  `f_fin` date default NULL,  PRIMARY KEY  (`f_inicio`),  KEY `F_factor_4400` (`f_inicio`,`f_fin`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `factcali6600` (  `cristal_a` decimal(8,3) NOT NULL default '1.000',  `cristal_b` decimal(8,3) NOT NULL default '1.000',  `f_inicio` date NOT NULL default '0000-00-00',  `f_fin` date default NULL,  `tipo` char(1) NOT NULL default '',  PRIMARY KEY  (`f_inicio`,`tipo`),  KEY `F_factor_6600` (`f_inicio`,`f_fin`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `fondos` (  `fondo_2` decimal(8,3) default NULL,  `fondo_3` decimal(8,3) default NULL,  `f_inicio` date NOT NULL default '0000-00-00',  `f_fin` date default NULL,  `tipo` char(1) NOT NULL default '',  PRIMARY KEY  (`f_inicio`,`tipo`),  KEY `F_idfondos` (`f_inicio`,`f_fin`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `fondospana` (
+  `fondo_2` decimal(8,3) default NULL,
+  `fondo_3` decimal(8,3) default NULL,
+  `f_inicio` date NOT NULL default '0000-00-00',
+  `f_fin` date default NULL,
+  `tipo` char(1) NOT NULL default '',
+  PRIMARY KEY  (`f_inicio`,`tipo`),
+  KEY `F_idfondos` (`f_inicio`,`f_fin`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `lotes` (
+  `cristal_a` decimal(8,3) NOT NULL default '1.000',
+  `cristal_b` decimal(8,3) NOT NULL default '1.000',
+  `dosimetro_inicial` int(10) unsigned NOT NULL default '0',
+  `dosimetro_final` int(10) unsigned NOT NULL default '0',
+  `tipo` char(1) NOT NULL default '',
+  PRIMARY KEY  (`dosimetro_inicial`,`tipo`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `lotespana` (
+  `cristal_a` decimal(8,3) NOT NULL default '1.000',
+  `cristal_b` decimal(8,3) NOT NULL default '1.000',
+  `dosimetro_inicial` int(10) unsigned NOT NULL default '0',
+  `dosimetro_final` int(10) unsigned NOT NULL default '0',
+  `tipo` char(1) NOT NULL default '',
+  PRIMARY KEY  (`dosimetro_inicial`,`tipo`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `parametros` (
+  `codempre` tinyint(4) NOT NULL default '0',
+  `nomempre` varchar(40) NOT NULL default '',
+  `domempre` varchar(40) NOT NULL default '',
+  `codposta` smallint(5) unsigned zerofill NOT NULL default '46000',
+  `pobempre` varchar(30) default NULL,
+  `proempre` varchar(30) default NULL,
+  `cifempre` varchar(9) default NULL,
+  `telempre` varchar(10) default NULL,
+  `faxempre` varchar(10) default NULL,
+  `diremail` varchar(50) default NULL,
+  `SmtpHost` varchar(50) default NULL,
+  `SmtpUser` varchar(50) default NULL,
+  `SmtpPass` varchar(50) default NULL,
+  `websoporte` varchar(100) default NULL,
+  `mailsoporte` varchar(100) default NULL,
+  `webversion` varchar(100) default NULL,
+  PRIMARY KEY  (`codempre`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `pcs` (
+  `codpc` int(3) NOT NULL default '0',
+  `nompc` varchar(50) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `rangoscsn` (
+  `Tipo` tinyint(3) NOT NULL default '0',
+  `orden` tinyint(4) NOT NULL default '0',
+  `desde` decimal(5,2) NOT NULL default '0.00',
+  `hasta` decimal(5,2) default NULL,
+  PRIMARY KEY  (`Tipo`,`orden`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `recepdosim` (
+  `n_reg_dosimetro` int(11) NOT NULL default '0',
+  `n_dosimetro` varchar(11) NOT NULL default '',
+  `dni_usuario` varchar(11) NOT NULL default '',
+  `c_empresa` varchar(11) NOT NULL default '',
+  `c_instalacion` varchar(11) NOT NULL default '',
+  `fecha_recepcion` date default NULL,
+  `f_creacion_recep` date NOT NULL default '0000-00-00',
+  `mes_p_i` char(1) NOT NULL default '',
+  `tipo_dosimetro` smallint(1) NOT NULL default '0',
+  `sistema` char(1) NOT NULL default 'H',
+  PRIMARY KEY  (`n_reg_dosimetro`,`n_dosimetro`,`dni_usuario`,`f_creacion_recep`,`mes_p_i`,`tipo_dosimetro`,`sistema`),
+  KEY `F_recep_dosim` (`n_reg_dosimetro`,`n_dosimetro`,`dni_usuario`,`fecha_recepcion`,`f_creacion_recep`),
+  KEY `F_dosim_f_recepc` (`n_dosimetro`,`fecha_recepcion`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `tipmedext` (
+  `c_tipo_med` char(2) NOT NULL default '',
+  `descripcion` varchar(30) NOT NULL default '',
+  PRIMARY KEY  (`c_tipo_med`),
+  KEY `F_tipo_med_ext` (`descripcion`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `tempnc` (
+  `codusu` smallint(4) unsigned NOT NULL default '0',
+  `fecha_lectura` date NOT NULL default '0000-00-00',
+  `hora_lectura` datetime default NULL,
+  `n_dosimetro` varchar(11) NOT NULL default '',
+  `cristal_1` decimal(8,3) default NULL,
+  `cristal_2` decimal(8,3) default NULL,
+  `cristal_3` decimal(8,3) default NULL,
+  `cristal_4` decimal(8,3) default NULL,
+  `sistema` char(1) default NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `usuarioempresadosis` (
+  `codusu` smallint(3) unsigned default '0',
+  `codempre` smallint(3) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `usuarios` (
+  `codusu` smallint(4) unsigned NOT NULL default '0',
+  `nomusu` char(30) NOT NULL default '',
+  `dirfich` char(50) default NULL,
+  `nivelusu` tinyint(1) NOT NULL default '-1',
+  `login` char(20) NOT NULL default '',
+  `passwordpropio` char(20) NOT NULL default '',
+  PRIMARY KEY  (`codusu`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `vempresas` (
+  `c_empresa` varchar(11) NOT NULL default '',
+  `f_alta` date NOT NULL default '0000-00-00',
+  `f_baja` date default NULL,
+  `cif_nif` varchar(15) default NULL,
+  `nom_comercial` varchar(40) NOT NULL default '',
+  `direccion` varchar(30) default NULL,
+  `poblacion` varchar(25) default NULL,
+  `c_postal` char(2) NOT NULL default '',
+  `distrito` char(3) default NULL,
+  `tel_contacto` varchar(14) default NULL,
+  `fax` varchar(14) default NULL,
+  `pers_contacto` varchar(40) default NULL,
+  `migrado` char(2) default NULL,
+  `mail_internet` varchar(30) default NULL,
+  `c_tipo` tinyint(4) NOT NULL default '0',
+  `codusu` int(3) NOT NULL default '0',
+  PRIMARY KEY  (`c_empresa`,`codusu`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `vinstalaciones` (
+  `c_empresa` varchar(11) NOT NULL default '',
+  `c_instalacion` varchar(11) NOT NULL default '',
+  `f_alta` date NOT NULL default '0000-00-00',
+  `f_baja` date default NULL,
+  `descripcion` varchar(50) NOT NULL default '',
+  `direccion` varchar(50) default NULL,
+  `poblacion` varchar(25) default NULL,
+  `c_postal` char(2) NOT NULL default '',
+  `distrito` char(3) default NULL,
+  `telefono` varchar(14) default NULL,
+  `fax` varchar(14) default NULL,
+  `persona_contacto` varchar(40) default NULL,
+  `migrado` char(2) default NULL,
+  `rama_gen` char(2) NOT NULL default '',
+  `rama_especifica` char(2) NOT NULL default '',
+  `mail_internet` varchar(30) default NULL,
+  `observaciones` varchar(80) default NULL,
+  `c_tipo` tinyint(4) NOT NULL default '0',
+  `codusu` int(3) NOT NULL default '0',
+  PRIMARY KEY  (`c_empresa`,`c_instalacion`,`codusu`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `voperarios` (
+  `dni` varchar(11) NOT NULL default '',
+  `n_seg_social` varchar(15) default NULL,
+  `n_carnet_radiolog` varchar(10) default NULL,
+  `f_emi_carnet_rad` date default NULL,
+  `apellido_1` varchar(15) NOT NULL default '',
+  `apellido_2` varchar(15) NOT NULL default '',
+  `nombre` varchar(15) NOT NULL default '',
+  `direccion` varchar(40) default NULL,
+  `poblacion` varchar(30) default NULL,
+  `c_postal` char(2) NOT NULL default '',
+  `distrito` char(3) default NULL,
+  `c_tipo_trabajo` char(2) NOT NULL default '',
+  `f_nacimiento` date default NULL,
+  `profesion_catego` varchar(30) default NULL,
+  `sexo` char(1) NOT NULL default '',
+  `plantilla_contrata` char(2) NOT NULL default '',
+  `f_alta` date NOT NULL default '0000-00-00',
+  `f_baja` date default NULL,
+  `migrado` char(2) default NULL,
+  `cod_rama_gen` char(2) NOT NULL default '',
+  `semigracsn` tinyint(1) NOT NULL default '1',
+  `codusu` int(3) NOT NULL default '0',
+  PRIMARY KEY  (`dni`,`codusu`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `zbloqueos` (
+  `codusu` smallint(1) unsigned NOT NULL default '0',
+  `tabla` char(20) NOT NULL default '',
+  `clave` char(40) NOT NULL default '',
+  PRIMARY KEY  (`tabla`,`clave`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `zdosimnorec` (
+  `codusu` int(3) NOT NULL default '0',
+  `c_empresa` varchar(11) default NULL,
+  `c_instalacion` varchar(11) default NULL,
+  `n_dosimetro` varchar(11) default NULL,
+  `dni_usuario` varchar(11) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `zdosisacum` (
+  `codusu` int(3) unsigned default '0',
+  `c_empresa` varchar(11) default NULL,
+  `c_instalacion` varchar(11) default NULL,
+  `dni_usuario` varchar(11) default NULL,
+  `mes` smallint(1) unsigned default NULL,
+  `ano` smallint(4) unsigned default NULL,
+  `n_dosimetro` varchar(11) default NULL,
+  `dosissuper` decimal(5,2) default NULL,
+  `dosisprofu` decimal(5,2) default NULL,
+  `situ` smallint(1) default NULL,
+  `n_reg_dosimetro` int(11) NOT NULL default '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `zdosisacumtot` (
+  `codusu` int(3) unsigned default '0',
+  `c_empresa` varchar(11) default NULL,
+  `c_instalacion` varchar(11) default NULL,
+  `dni_usuario` varchar(11) default NULL,
+  `dosissuper` decimal(5,2) default NULL,
+  `dosisprofu` decimal(5,2) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `zlistadocsn` (
+  `codusu` int(3) NOT NULL default '0',
+  `tipo` tinyint(4) NOT NULL default '0',
+  `descripcion` varchar(40) default NULL,
+  `numeroreg` int(10) NOT NULL default '0',
+  `dosisacum` decimal(12,2) NOT NULL default '0.00',
+  PRIMARY KEY  (`codusu`,`tipo`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `zlistadomigracion` (
+  `codusu` int(3) default '0',
+  `n_registro` int(11) NOT NULL default '0',
+  `n_dosimetro` varchar(11) default NULL,
+  `dni_usuario` varchar(11) default NULL,
+  `cristal2` decimal(5,2) default NULL,
+  `cristal3` decimal(5,2) default NULL,
+  `f_migracion` date default NULL,
+  `punt_error` char(2) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `ztempemail` (
+  `codusu` int(3) default '0',
+  `c_instalacion` varchar(11) NOT NULL default '',
+  `email` varchar(30) default NULL,
+  `fichero` varchar(30) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

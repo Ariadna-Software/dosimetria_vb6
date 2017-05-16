@@ -1,0 +1,5 @@
+Línea 62: la clase TabDlg.SSTab del control SSTab1 no era una clase de control cargada.
+Línea 156: la clase MSAdodcLib.Adodc del control Adodc1 no era una clase de control cargada.
+Línea 702: la clase MSDataGridLib.DataGrid del control DataGrid1 no era una clase de control cargada.
+Línea 896: la clase MSAdodcLib.Adodc del control Data1 no era una clase de control cargada.
+Línea 943: la clase MSComctlLib.Toolbar del control Toolbar1 no era una clase de control cargada.
